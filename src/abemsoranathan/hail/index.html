@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>All Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #121212;
+      color: white;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00e5ff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #333;
+    }
+
+    th {
+      background-color: #222;
+      text-align: left;
+    }
+
+    tr:hover {
+      background-color: #2c2c2c;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    .rank-owner { background: #ffd600; color: #000; }
+    .rank-admin { background: #e53935; color: #fff; }
+    .rank-mod { background: #7a5cff; color: #fff; }
+    .rank-member { background: #666; color: #fff; }
+    .rank-cosmetic { background: hotpink; color: #fff; }
+    .rank-banned { background: purple; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>All Users</h1>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>Display Name</th>
+        <th>Rank</th>
+        <th>UID</th>
+        <th>Muted?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filled by script -->
+    </tbody>
+  </table>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKPtgwjllQOqB9RNmRcCzgeYvnkHEMavE",
+      authDomain: "runora-auth.firebaseapp.com",
+      projectId: "runora-auth",
+      storageBucket: "runora-auth.appspot.com",
+      messagingSenderId: "367293618403",
+      appId: "1:367293618403:web:a9bd8c9f267e8c2aa74dd6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return;
+
+      const tableBody = document.querySelector("#userTable tbody");
+      const usersSnap = await db.collection("users").get();
+
+      usersSnap.forEach(doc => {
+        const data = doc.data();
+        const displayName = data.displayName || "Unknown";
+        const rank = (data.rank || "member").toLowerCase();
+        const muted = data.muted === true ? "Yes" : "No";
+        const uid = doc.id;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${displayName}</td>
+          <td><span class="pill rank-${rank}">${rank}</span></td>
+          <td>${uid}</td>
+          <td>${muted}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    });
+  </script>
+
+</body></html>

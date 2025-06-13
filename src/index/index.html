@@ -1,0 +1,231 @@
+<!DOCTYPE html><html lang="en"><head>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <title>Wildwest</title>
+  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-image: url(https://cdn.suwalls.com/wallpapers/space/international-space-station-orbiting-earth-29433-1920x1080.jpg);
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font-sans);
+    }
+
+    main.container {
+      flex: 1;
+      max-width: var(--max-width);
+      margin: auto;
+      padding: 4rem 2rem 2rem;
+      text-align: center;
+      background: rgba(0,0,0,0.6);
+      border-radius: var(--radius);
+      box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    }
+
+    h2 {
+      font-weight: 800;
+      font-size: 2.25rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    p.text-muted {
+      color: #bbb;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn-black {
+      background: #000;
+      color: var(--color-white);
+      padding: 0.7em 1.5em;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      margin: 0 0.5rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-black:hover {
+      background-color: #111;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+    }
+
+    .navbar-left .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: white;
+    }
+
+    .navbar-center a {
+      margin: 0 1rem;
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .navbar-center a:hover {
+      color: #fff;
+    }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 220px;
+      justify-content: flex-end;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      color: #ccc;
+      font-size: 0.9rem;
+      background: rgba(0, 0, 0, 0.6);
+      border-top: 1px solid #222;
+    }
+
+    footer a {
+      color: #bbb;
+      margin: 0 0.75rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <img src="logo.png" width="48" height="48" alt="Wildwest Logo" class="logo">
+    </div>
+    <div class="navbar-center">
+      <a href="/">Home</a>
+      <a href="/games">Games</a>
+      <a href="/proxy">Proxy</a>
+      <a href="/chat">Chat</a>
+      <a href="/tools">Tools</a>
+    </div>
+    <div class="navbar-right" id="userMenu"><a href="/auth" class="btn btn-white btn-sm">Sign In</a></div>
+  </nav>
+
+  <main class="container center">
+    <h2>
+      Thousands of unblocked games,<br>
+      custom-coded proxies,<br>
+      and a chaotic, unfiltered chatroom.<br>
+      All for you.
+    </h2>
+    <p class="text-muted">
+      All ready-to-run on your school Chromebook.
+    </p>
+    <div>
+      <a href="/games" class="btn-black">Browse Games</a>
+      <a href="/proxy" class="btn-black">Use Proxy</a>
+      <a href="/chat" class="btn-black">Chat</a>
+    </div>
+    <br>
+  </main>
+
+  <footer>
+    Wildwest 2025
+    <p>Version 1.1.5</p>
+    <a href="/staff">Staff and Joining</a>
+    <a href="/tos">Terms</a>
+    <a href="/privacy">Privacy</a>
+  </footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKPtgwjllQOqB9RNmRcCzgeYvnkHEMavE",
+      authDomain: "runora-auth.firebaseapp.com",
+      projectId: "runora-auth",
+      storageBucket: "runora-auth.firebasestorage.app",
+      messagingSenderId: "367293618403",
+      appId: "1:367293618403:web:a9bd8c9f267e8c2aa74dd6",
+      measurementId: "G-X788CHRJTJ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const userMenu = document.getElementById("userMenu");
+
+    function getRankClass(rank) {
+      const r = (rank || "").toLowerCase();
+      if (r === "owner") return "rank-owner";
+      if (r === "admin") return "rank-admin";
+      if (r === "mod") return "rank-mod";
+      if (r === "member") return "rank-member";
+      return "rank-cosmetic";
+    }
+
+    let hasTriedAnonymous = false;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        if (!hasTriedAnonymous) {
+          hasTriedAnonymous = true;
+          try {
+            await auth.signInAnonymously();
+            return;
+          } catch {
+            userMenu.innerHTML = `<a href="/auth" class="btn btn-white btn-sm">Sign In</a>`;
+            return;
+          }
+        } else {
+          userMenu.innerHTML = `<a href="/auth" class="btn btn-white btn-sm">Sign In</a>`;
+          return;
+        }
+      }
+
+      try {
+        const docRef = db.collection("users").doc(user.uid);
+        const snap = await docRef.get();
+        if (!snap.exists) {
+          await docRef.set({
+            displayName: "Unknown",
+            rank: "Member",
+            role: "user"
+          });
+        }
+        const data = (await docRef.get()).data();
+        const { displayName, rank } = data;
+        const tagClass = getRankClass(rank || "member");
+
+        userMenu.innerHTML = `
+          <span>${displayName}</span>
+          <span class="pill ${tagClass}" style="margin-left: 0.5rem;">${rank}</span>
+          <button onclick="auth.signOut()" class="btn btn-black btn-sm" style="margin-left: 0.75rem;">Log Out</button>
+        `;
+      } catch (err) {
+        console.error("Failed to load user data:", err);
+        userMenu.innerHTML = `<a href="/auth" class="btn btn-white btn-sm">Sign In</a>`;
+      }
+    });
+  </script>
+
+</body></html>
