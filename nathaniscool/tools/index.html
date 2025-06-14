@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>Wildwest Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles.css/index.html">
+</head>
+<body class="darkmode">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <span class="logo">🌵 Wildwest</span>
+    </div>
+    <div class="navbar-center">
+      <a href="../games/index.html">Games</a>
+      <a href="../proxy/index.html">Proxy</a>
+      <a href="../chat/index.html">Chat</a>
+      <a href="../tools/index.html" class="pill">Tools</a>
+    </div>
+    <div class="navbar-right" id="userMenu">Loading...</div>
+  </nav>
+
+  <!-- Tools Main -->
+  <main class="container center pad-lg text-center">
+    <h2 class="mb-2">🛠️ Tools</h2>
+    <p class="text-muted">Useful tools you can use inside Wildwest.</p>
+
+    <!-- Calculator Widget -->
+    <div class="calculator center" style="max-width: 320px; background: #1e1e1e; border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 20px rgba(0,0,0,0.5); margin-top: 2rem;">
+      <input id="display" class="display" type="text" placeholder="0" inputmode="decimal" style="width: 100%; font-size: 1.5rem; padding: 0.5rem; text-align: right; background: #000; color: #0f0; border-radius: 8px; border: none; margin-bottom: 1rem;">
+
+      <div class="buttons" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+        <button class="btn btn-white btn-calc" onclick="press('7')">7</button>
+        <button class="btn btn-white btn-calc" onclick="press('8')">8</button>
+        <button class="btn btn-white btn-calc" onclick="press('9')">9</button>
+        <button class="btn btn-white btn-calc" onclick="press('/')">/</button>
+
+        <button class="btn btn-white btn-calc" onclick="press('4')">4</button>
+        <button class="btn btn-white btn-calc" onclick="press('5')">5</button>
+        <button class="btn btn-white btn-calc" onclick="press('6')">6</button>
+        <button class="btn btn-white btn-calc" onclick="press('*')">*</button>
+
+        <button class="btn btn-white btn-calc" onclick="press('1')">1</button>
+        <button class="btn btn-white btn-calc" onclick="press('2')">2</button>
+        <button class="btn btn-white btn-calc" onclick="press('3')">3</button>
+        <button class="btn btn-white btn-calc" onclick="press('-')">-</button>
+
+        <button class="btn btn-white btn-calc" onclick="press('0')">0</button>
+        <button class="btn btn-white btn-calc" onclick="press('.')">.</button>
+        <button class="btn btn-white btn-calc" onclick="calculate()">=</button>
+        <button class="btn btn-white btn-calc" onclick="press('+')">+</button>
+
+        <button class="btn btn-black btn-calc" onclick="clearDisplay()" style="grid-column: span 4;">Clear</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center mt-2 text-sm text-muted">
+    Wildwest 2025<br>
+    <a href="../staff/index.html">Staff and Joining</a>
+  </footer>
+
+  <!-- Calculator Logic -->
+  <script>
+    const display = document.getElementById("display");
+
+    function press(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = "";
+    }
+
+    function calculate() {
+      try {
+        display.value = eval(display.value).toString();
+      } catch {
+        display.value = "Error";
+      }
+    }
+
+    display.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        calculate();
+      }
+    });
+  </script>
+
+
+</body></html>
